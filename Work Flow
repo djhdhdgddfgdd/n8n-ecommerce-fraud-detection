@@ -1,0 +1,204 @@
+{
+  "name": "E-commerce Order Monitoring & Fraud Detection (Production Demo)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ecom-orders-secure",
+        "options": {}
+      },
+      "id": "a01973d9-ecc0-4e36-9eef-d3cbe3db0fce",
+      "name": "Secure Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        -448,
+        80
+      ],
+      "webhookId": "759712fe-2597-4a9a-ae68-e789ce52b08c"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.headers['x-webhook-secret'] }}",
+              "value2": "DEMO_SECRET_456"
+            }
+          ]
+        }
+      },
+      "id": "1f050eae-7fa2-414d-b840-1f8ea8a9ce99",
+      "name": "Verify Webhook Secret",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        -224,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "keepOnlySet": true,
+        "values": {
+          "number": [
+            {
+              "name": "amount",
+              "value": "={{ $json.body.amount }}"
+            }
+          ],
+          "string": [
+            {
+              "name": "order_id",
+              "value": "={{ $json.body.order_id }}"
+            },
+            {
+              "name": "country",
+              "value": "={{ $json.body.country }}"
+            }
+          ],
+          "boolean": [
+            {
+              "name": "new_customer",
+              "value": "={{ $json.body.new_customer }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "2b67b772-c112-4c6d-871d-3b2ee349ca7c",
+      "name": "Normalize Order Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{ $json.amount }}",
+              "operation": "larger"
+            }
+          ]
+        }
+      },
+      "id": "b4c07120-19e7-4d58-aa47-4c66f93e4690",
+      "name": "Validate Order",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        224,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "risk_level",
+              "value": "={{ $json.amount > 1000 && $json.new_customer ? 'HIGH' : ($json.amount > 500 ? 'MEDIUM' : 'LOW') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "0b705f90-c025-4bfe-a3f0-fe4aca4cfa69",
+      "name": "Fraud Risk Logic",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        448,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://webhook.site/6b880026-c28f-4983-b465-c6a84963e1a7",
+        "options": {}
+      },
+      "id": "02c0d951-d2c0-47fc-aa39-b900b734c869",
+      "name": "Notify Ops Team (Audit Log)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        672,
+        80
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Secure Webhook": {
+      "main": [
+        [
+          {
+            "node": "Verify Webhook Secret",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verify Webhook Secret": {
+      "main": [
+        [
+          {
+            "node": "Normalize Order Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Order Data": {
+      "main": [
+        [
+          {
+            "node": "Validate Order",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Order": {
+      "main": [
+        [
+          {
+            "node": "Fraud Risk Logic",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fraud Risk Logic": {
+      "main": [
+        [
+          {
+            "node": "Notify Ops Team (Audit Log)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "566a8420-dbd2-4c89-9d5e-a9ff7f626881",
+  "meta": {
+    "instanceId": "c8784d17933713f23e6e89969f652118adee231e88d554814bc1bd6cff4d93e2"
+  },
+  "id": "Q7Foi2wIMKUIR6QvTAHwu",
+  "tags": []
+}
