@@ -89,15 +89,11 @@ n8n-ecommerce-fraud-detection/
 ### Example cURL Request
 
 ```bash
-curl -X POST http://localhost:5678/webhook-test/ecom-orders-secure \
--H "Content-Type: application/json" \
--H "x-webhook-secret: DEMO_SECRET_456" \
--d '{
-  "order_id": "ORD-1001",
-  "amount": 1200,
-  "country": "SA",
-  "new_customer": true
-}'
+curl -X POST http://localhost:5678/webhook-test/ecom-orders-secure ^
+-H "Content-Type: application/json" ^
+-H "x-webhook-secret: DEMO_SECRET_456" ^
+-d "{\"order_id\":\"ORD-1001\",\"amount\":1200,\"country\":\"SA\",\"new_customer\":true}"
+
 Expected Result
 الطلب يمر على جميع العقد
 
