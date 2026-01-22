@@ -88,7 +88,6 @@ n8n-ecommerce-fraud-detection/
 
 ### Example cURL Request
 
-##cmd comand:
 curl -X POST http://localhost:5678/webhook-test/ecom-orders-secure ^
 -H "Content-Type: application/json" ^
 -H "x-webhook-secret: DEMO_SECRET_456" ^
